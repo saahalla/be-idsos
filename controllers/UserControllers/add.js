@@ -1,5 +1,7 @@
 const client = require('../../module/mongodb')
 const bcrypt = require('bcrypt')
+const MainClass = require('../../class/main.class')
+const Main = new MainClass();
 
 module.exports = async(req, res, next) => {
     console.log('add')
@@ -11,8 +13,7 @@ module.exports = async(req, res, next) => {
     const saltRounds = 10;
     const hashPassword = bcrypt.hashSync(password, saltRounds);
     /* date */
-    const date = new Date();
-    createAt = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    createAt = Main.getCreatioDate()
     console.log({
         username: username,
         name: name,
@@ -23,11 +24,11 @@ module.exports = async(req, res, next) => {
         updateAt: createAt
     })
     const insertData = {
-        username: username,
-        name: name,
-        email: email,
+        username,
+        name,
+        email,
         password: hashPassword,
-        createAt: createAt,
+        createAt,
         updateAt: createAt
     }
 
