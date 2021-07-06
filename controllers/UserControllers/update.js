@@ -1,41 +1,34 @@
-const client = require('../../module/mongodb')
-const bcrypt = require('bcrypt');
-const { ObjectID } = require('mongodb');
-const { query } = require('express');
+const bcrypt = require('bcrypt')
+const UserModel = require('../../models/UserModel')
+const Users = new UserModel()
 
 module.exports = async(req, res, next) => {
-    const action = req.body.action;
-    var password = req.body.password;
-    var username = req.body.username;
-    var name = req.body.name;
-    var email = req.body.email;
-    var id = req.body.id;
-    var query;
-    /* date Update At */
-    const date = new Date();
-    const updateAt = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    console.log('ok')
+    const {id, username, name, password, email} =  req.body
+    const updateAt = new Date()
+    /* password hash */
+    const saltRounds = 10;
+    const hashPassword = bcrypt.hashSync(password, saltRounds);
 
-    if (action == 'updatePassword') query = {$set: {password: password, updateAt: updateAt}}
-    if (action == 'updateUsername') query = {$set: {username: username, updateAt: updateAt}}
-    if (action == 'updateName') query = {$set: {name: name, updateAt: updateAt}}
-    if (action == 'updateEmail') query = {$set: {email: email, updateAt: updateAt}}
+    const data = {username, name, password: hashPassword, email}
 
-    if(client.isConnected()){
-        const db = client.db('idsos');
-        const checkUsername = await db.collection('users').find({username: username}).toArray()
-        const checkEmail= await db.collection('users').find({email: email}).toArray()
-        if(checkUsername[0]) {
-            res.send({status: false, msg: 'The username is already in use'})
-        }else if(checkEmail[0]) {
-            res.send({status: false, msg: 'The email address is already in use'})
-        }else {
-            console.log({username: username, cek: checkUsername})
-            const users = await db.collection('users').updateOne({'_id': ObjectID(id)}, query)
-            
-            res.send({status: true, data: users});
+    for(key in data){
+        // console.log(key)
+        if (data[key] === undefined || data[key] === '' || data[key] === null) {
+            delete data[key]
         }
-        
-    }else{
-        res.send({status: false, msg: 'error connection database'});
     }
+
+    const updateUser = await Users.updateUser({_id: id}, data)
+
+    console.log({data, updateUser})
+
+    if (updateUser.nModified === 1){
+        updateUpdateAt = await Users.updateUser({_id: id}, {updateAt})
+        const user = await Users.getUser(id)
+        res.send({status: true, data: user, result: updateUser})
+    }else{
+        res.send({status: false, message: 'data can not be update', result: updateUser})
+    }
+    
 }

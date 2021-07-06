@@ -1,18 +1,23 @@
-const { ObjectID } = require('mongodb');
-const client = require('../../module/mongodb')
+const UserModel = require('../../models/UserModel')
+const Users = new UserModel()
 
 module.exports = async(req, res, next) => {
-    if(client.isConnected()){
-        console.log(req.query)
-        var id = req.query.id;
-        var username = req.query.username;
+    console.log(req.params)
+    var id = req.params.id;
 
-        query = id ? {'_id': ObjectID(id)} : {username: username}
-        const db = client.db('idsos');
-        const users = await db.collection('users').find(query).toArray();
+    try {
+        showUser = await Users.getUser(id)
+        console.log({showUser})
+
+        if(showUser._id){
+            res.send({status: true, data: showUser})
+        }else{
+            res.status(404).send({status: false, message: `User not found`})
+        }
         
-        res.send({status: true, data: users});
-    }else{
-        res.send({status: 'false', msg: 'error connection database'});
+    } catch (error) {
+        res.status(404).send({status: false, message: `User not found`})
     }
+
+    
 }

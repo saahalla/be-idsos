@@ -1,12 +1,12 @@
-const client = require('../../module/mongodb')
+const UserModel = require('../../models/UserModel')
+const Users = new UserModel()
 
 module.exports = async(req, res, next) => {
-    if(client.isConnected()){
-        const db = client.db('idsos');
-        const users = await db.collection('users').find().toArray();
-        
-        res.send({status: true, data: users});
-    }else{
-        res.send({status: 'false', msg: 'error connection database'});
+    const users = await Users.getAllData()
+    // console.log(users)
+    if(users.length > 0){
+        res.send({status: true, data: users})
+    } else {
+        res.send({status: false, error: users})
     }
 }

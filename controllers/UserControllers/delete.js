@@ -1,15 +1,19 @@
-const { ObjectID } = require('mongodb');
-const client = require('../../module/mongodb')
+const UserModel = require('../../models/UserModel')
+const Users = new UserModel()
 
 module.exports = async(req, res, next) => {
     const id = req.params.id;
-    console.log(id)
-    if(client.isConnected()){
-        const db = client.db('idsos');
-        const deleteUser = await db.collection('users').deleteOne({'_id': ObjectID(id)})
-        console.log({id: id, res: deleteUser})
-        res.send({status: true, msg: 'User data has been deleted successfully', data: deleteUser});
+    
+    const deleteUser = await Users.deleteUser(id);
+
+    console.log(deleteUser);
+
+    if(deleteUser.deletedCount === 1){
+        res.send({status: true, message: 'user has been deleted', result: deleteUser})
     }else{
-        res.send({status: 'false', msg: 'error connection database'});
+        res.status(404).send({status: false, message: 'user not found', result: deleteUser})
     }
+
+    
+
 }

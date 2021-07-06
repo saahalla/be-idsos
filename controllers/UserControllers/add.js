@@ -1,7 +1,6 @@
-const client = require('../../module/mongodb')
 const bcrypt = require('bcrypt')
-const MainClass = require('../../class/main.class')
-const Main = new MainClass();
+const UserModel = require('../../models/UserModel')
+const Users = new UserModel()
 
 module.exports = async(req, res, next) => {
     console.log('add')
@@ -13,16 +12,8 @@ module.exports = async(req, res, next) => {
     const saltRounds = 10;
     const hashPassword = bcrypt.hashSync(password, saltRounds);
     /* date */
-    createAt = Main.getCreatioDate()
-    console.log({
-        username: username,
-        name: name,
-        email: email,
-        hashPassword: hashPassword,
-        password: password,
-        createAt: createAt,
-        updateAt: createAt
-    })
+    createAt = new Date()
+    
     const insertData = {
         username,
         name,
@@ -31,23 +22,15 @@ module.exports = async(req, res, next) => {
         createAt,
         updateAt: createAt
     }
+    console.log(insertData)
 
-    if(client.isConnected()){
-        const db = client.db('idsos');
-        const checkUsername = await db.collection('users').find({username: username}).toArray()
-        const checkEmail= await db.collection('users').find({email: email}).toArray()
-        if(checkUsername[0]) {
-            res.send({status: false, msg: 'The username is already in use'})
-        }else if(checkEmail[0]) {
-            res.send({status: false, msg: 'The email address is already in use'})
-        }else {
-            console.log({username: username, cek: checkUsername})
-            const users = await db.collection('users').insertOne(insertData)
-            
-            res.send({status: true, data: users.ops});
-        }
-        
-    }else{
-        res.send({status: false, msg: 'error connection database'});
+    const insert = await Users.createUser(insertData)
+    
+    console.log({insert})
+
+    if(insert._id){
+        res.send({status: true, data: insert})
+    } else {
+        res.send({status: false, error: insert})
     }
 }
