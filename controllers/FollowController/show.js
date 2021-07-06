@@ -1,12 +1,12 @@
-const client = require('../../module/mongodb')
+const FollowerModel = require('../../models/FollowModel')
+const Followers = new FollowerModel()
 
 module.exports = async(req, res, next) => {
-    if(client.isConnected()){
-        const db = client.db('idsos');
-        const follows = await db.collection('followers').find().toArray();
-        
-        res.send({status: true, data: follows});
+    followers = await Followers.getAllData()
+
+    if(followers.length > 0){
+        res.send({status: true, data: followers})
     }else{
-        res.send({status: 'false', msg: 'error connection database'});
+        res.send({status: false, error: followers})
     }
 }
