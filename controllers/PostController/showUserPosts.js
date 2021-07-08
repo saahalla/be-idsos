@@ -1,14 +1,16 @@
-const { ObjectID } = require('mongodb');
-const client = require('../../module/mongodb')
+const PostModel = require('../../models/PostModel')
+const Posts = new PostModel()
 
 module.exports = async(req, res, next) => {
-    userId = req.query.userId;
-    if(client.isConnected()){
-        const db = client.db('idsos');
-        const userPosts = await db.collection('posts').find({userId}).toArray();
-        
-        res.send({status: true, data: userPosts});
-    }else{
-        res.send({status: 'false', msg: 'error connection database'});
+    const userId = req.params.userId
+    console.log(userId)
+    
+    const posts = await Posts.getUserPosts(userId)
+
+    if(posts.length > 0){
+        res.send({status: true, data: posts})
+    } else {
+        res.send({status: false, error: posts})
     }
+    
 }

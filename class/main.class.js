@@ -32,9 +32,7 @@ class Main{
     //     }else{
     //         return false
     //     }
-    // }
-
-    
+    // }    
 }
 module.exports = Main
 

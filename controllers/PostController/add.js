@@ -1,30 +1,21 @@
-const client = require('../../module/mongodb')
-const MainClass = require('../../class/main.class')
-const PostClass = require('../../class/post.class')
-const Main = new MainClass()
-const Post = new PostClass()
-
+const PostModel = require('../../models/PostModel')
+const Posts = new PostModel()
 
 module.exports = async(req, res, next) => {
-    console.log('add')
-    const userId = req.body.userId;
-    const postContent = req.body.postContent;
-    const hashtag = Post.getHashtag(postContent);
-    const createAt = Main.getCreatioDate();
+    const { userId, content } = req.body;
+    const hashtag = Posts.getHashtag(content);
+    const createAt = new Date()
 
-    const insertData = {userId, postContent, hashtag, createAt, updateAt: createAt};
+    const insertData = {userId, content, hashtag, createAt, updateAt: createAt};
 
-    console.log(insertData)
+    console.log({add_reqBody: req.body, insertData})
 
-    if(client.isConnected()){
-        const db = client.db('idsos');
-        
-        // console.log({username: username, cek: checkUsername})
-        const posts = await db.collection('posts').insertOne(insertData)
-        
-        res.send({status: true, data: posts.ops});
-        
-    }else{
-        res.send({status: false, msg: 'error connection database'});
+    const insert = await Posts.createPost(insertData)
+    console.log({insert})
+    
+    if(insert._id){
+        res.send({status: true, data: insert})
+    } else {
+        res.send({status: false, error: insert})
     }
 }

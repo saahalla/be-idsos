@@ -14,6 +14,4 @@ module.exports = async(req, res, next) => {
         res.status(404).send({status: false, message: 'user not found', result: deleteUser})
     }
 
-    
-
 }
