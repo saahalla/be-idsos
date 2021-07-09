@@ -1,5 +1,8 @@
 const Mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 require('../module/mongoose_connections');
+const config = require('../config/config')
 
 const userSchema = new Mongoose.Schema({
     username: {
@@ -64,6 +67,15 @@ class UserModel{
         }
         
     }
+    async getUserByEmailUsername(search) {
+        try {
+            const user = await User.findOne(search)
+            // console.log(user)
+            return user
+        } catch (error) {
+            return error
+        }
+    }
     async updateUser(search, data) {
         try {
             const updateUser = await User.updateOne(search, data)
@@ -92,6 +104,34 @@ class UserModel{
             return deleteUser
         } catch (error) {
             return error
+        }
+    }
+    async login(username, password){
+        try {
+            const user = await User.findOne({username})
+            
+            const dbPassword = user.password
+
+            const validatePassword = bcrypt.compareSync(password, dbPassword)
+            console.log({user, pwd: validatePassword})
+
+            const secretKey = config.data.secretKey
+            if(validatePassword){
+                console.log({cek:"okvalidate", secretKey})
+                const token = jwt.sign({username, password}, secretKey, {expiresIn: '1d'})
+                console.log(token)
+                const result = {
+                    message: 'login success',
+                    token
+                }
+                console.log({result})
+                return result
+            }else{
+                return false
+            }
+
+        } catch (error) {
+            
         }
     }
 }

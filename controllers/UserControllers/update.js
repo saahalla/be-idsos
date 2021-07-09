@@ -6,9 +6,16 @@ module.exports = async(req, res, next) => {
     console.log('ok')
     const {id, username, name, password, email} =  req.body
     const updateAt = new Date()
-    /* password hash */
-    const saltRounds = 10;
-    const hashPassword = bcrypt.hashSync(password, saltRounds);
+    console.log({cek: req.body, password})
+    /* check password will be update ??? */
+    if(password !== undefined && password !== '' && password !== null){
+        /* password hash */
+        const saltRounds = 10;
+        var hashPassword = bcrypt.hashSync(password, saltRounds);
+    }else{
+        var hashPassword = null
+    }
+    /* --------------------------------- */
 
     const data = {username, name, password: hashPassword, email}
 

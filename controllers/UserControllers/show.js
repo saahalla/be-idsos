@@ -3,7 +3,7 @@ const Users = new UserModel()
 
 module.exports = async(req, res, next) => {
     console.log(req.params)
-    var id = req.params.id;
+    const id = req.params.id;
 
     try {
         showUser = await Users.getUser(id)
@@ -18,6 +18,5 @@ module.exports = async(req, res, next) => {
     } catch (error) {
         res.status(404).send({status: false, message: `User not found`})
     }
-
     
 }
