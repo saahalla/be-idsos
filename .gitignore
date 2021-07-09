@@ -62,4 +62,5 @@ typings/
 .next
 
 #config
+config/config.*
 config/*
