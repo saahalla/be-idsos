@@ -2,7 +2,7 @@ const Mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('../module/mongoose_connections');
-const config = require('../config/config')
+const config = require('../config/config');
 
 const userSchema = new Mongoose.Schema({
     username: {
@@ -27,7 +27,12 @@ const userSchema = new Mongoose.Schema({
         required: true,
         minlength: 2,
         maxlength: 40,
-    }, 
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'root', 'superadmin', 'user'],
+        default: 'user'
+    },
     password: {
         type: String,
         required: true,
@@ -60,7 +65,8 @@ class UserModel{
     async getUser(id) {
         try {
             const user = await User.findOne({_id: id})
-            // console.log(user)
+            const {_id, username, name, email, password, createAt, updateAt} = user
+            
             return user
         } catch (error) {
             return error

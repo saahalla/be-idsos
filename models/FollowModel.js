@@ -1,7 +1,7 @@
 const Mongoose = require('mongoose');
 require('../module/mongoose_connections');
 const UserModel = require('./UserModel');
-Users = new UserModel();
+const Users = new UserModel();
 
 const followerSchema = new Mongoose.Schema({
     userId : {

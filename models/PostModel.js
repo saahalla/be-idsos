@@ -14,6 +14,14 @@ const postSchema = new Mongoose.Schema({
         type: [String],
         default: []
     }, 
+    likes: {
+        type: Number,
+        default: 0
+    },
+    comments: {
+        type: Number,
+        default: 0
+    },
     createAt: {
         type: Date, 
         default: Date.now
