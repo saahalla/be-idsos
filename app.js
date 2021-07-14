@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var followRouter = require('./routes/follow');
 var postsRouter = require('./routes/posts');
+var commentRouter = require('./routes/comment');
 
 var app = express();
 
@@ -17,6 +18,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(cors())
+// OR
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.header("Access-Control-Allow-Headers", "x-access-token, Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  next();
+});
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -27,6 +36,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/follow', followRouter);
 app.use('/posts', postsRouter);
+app.use('/comments', commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
